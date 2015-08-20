@@ -34,13 +34,12 @@ echo 'root:<%= root_pass -%>' | /usr/sbin/chpasswd -e
 <% end -%>
 
 <% if puppet_enabled -%>
-<% if @host.params['enable-puppetlabs-repo'] && @host.params['enable-puppetlabs-repo'] == 'true' -%>
 <% if @host.operatingsystem.name == 'Fedora' -%>
 rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-fedora-<%= os_major -%>.noarch.rpm
 <% else -%>
 rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-el-<%= os_major -%>.noarch.rpm
 <% end -%>
-<% end -%>
+yum -t -y -e 0 update
 yum -t -y -e 0 install puppet
 <% end -%>
 

@@ -17,13 +17,21 @@ oses:
 <%# Cloud instances frequently have incorrect hosts data %>
 <%= snippet 'fix_hosts' %>
 
+<% if @host.operatingsystem.name == 'Fedora' -%>
+# Install Puppet Labs package repository Fedora
+rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-fedora-<%= @host.operatingsystem.major -%>.noarch.rpm
+<% else -%>
+# Install Puppet Labs package repository RHEL
+rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-el-<%= @host.operatingsystem.major -%>.noarch.rpm
+<% end -%>
+
 <%
   # safemode renderer does not support unary negation
   pm_set = @host.puppetmaster.empty? ? false : true
   puppet_enabled = pm_set || @host.params['force-puppet'] && @host.params['force-puppet'] == 'true'
 %>
 <% if puppet_enabled %>
-yum install -y puppet
+yum install -y puppet wget
 cat > /etc/puppet/puppet.conf << EOF
 <%= snippet 'puppet.conf' %>
 EOF
