@@ -30,8 +30,18 @@ rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-el-<%= @host.operatingsyst
   pm_set = @host.puppetmaster.empty? ? false : true
   puppet_enabled = pm_set || @host.params['force-puppet'] && @host.params['force-puppet'] == 'true'
 %>
-<% if puppet_enabled %>
+
+sed -i "s/^#*[ ]*PermitRootLogin no/PermitRootLogin yes/" /etc/ssh/sshd_config
+sed -i "s/^#*[ ]*PermitRootLogin yes/PermitRootLogin yes/" /etc/ssh/sshd_config
+sed -i "s/^#*[ ]*PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
+sed -i "s/^#*[ ]*PasswordAuthentication yes/PasswordAuthentication yes/" /etc/ssh/sshd_config
+
+service sshd restart
+
+echo 'root:<%= root_pass %>' | chpasswd -e
+
 yum install -y puppet wget
+
 cat > /etc/puppet/puppet.conf << EOF
 <%= snippet 'puppet.conf' %>
 EOF
@@ -40,7 +50,6 @@ EOF
 /sbin/chkconfig --level 345 puppet on
 
 /usr/bin/puppet agent --config /etc/puppet/puppet.conf --onetime --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
-<% end -%>
 
 # UserData still needs wget to mark as finished
 /usr/bin/wget --quiet --output-document=/dev/null --no-check-certificate <%= foreman_url('built') %>
