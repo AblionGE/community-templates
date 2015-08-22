@@ -52,6 +52,7 @@ EOF
 /usr/bin/puppet agent --config /etc/puppet/puppet.conf --onetime --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
 # Enable puppet at startup
 /usr/bin/puppet resource service puppet enable=true
+service puppet start
 
 # UserData still needs wget to mark as finished
 /usr/bin/wget --quiet --output-document=/dev/null --no-check-certificate <%= foreman_url('built') %>
