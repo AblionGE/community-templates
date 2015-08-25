@@ -31,6 +31,8 @@ rpm -ivh http://yum.puppetlabs.com/puppetlabs-release-el-<%= @host.operatingsyst
   puppet_enabled = pm_set || @host.params['force-puppet'] && @host.params['force-puppet'] == 'true'
 %>
 
+yum -t -y -e 0 update
+
 sed -i "s/^#*[ ]*PermitRootLogin no/PermitRootLogin yes/" /etc/ssh/sshd_config
 sed -i "s/^#*[ ]*PermitRootLogin yes/PermitRootLogin yes/" /etc/ssh/sshd_config
 sed -i "s/^#*[ ]*PasswordAuthentication no/PasswordAuthentication yes/" /etc/ssh/sshd_config
